@@ -1,5 +1,6 @@
 package com.mq76.holyTask_be.service;
 
+import com.mq76.holyTask_be.controller.NotificationController;
 import com.mq76.holyTask_be.model.MessageConstants;
 import com.mq76.holyTask_be.model.NotificationDTO;
 import com.mq76.holyTask_be.model.ResponseObject;
@@ -27,13 +28,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 public class VisitScheduleServiceImpl implements VisitScheduleService {
 
     private final VisitScheduleRepository repository;
-
     @Override
     public ResponseObject createScheduleVisit(VisitSchedule visit) {
         try {
@@ -41,7 +42,29 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
             visit.setStatus(1);
             visit.setDatetime(visit.getDatetime());
             visit.setCreatedAt(new Date());
-            repository.save(visit);
+
+            VisitSchedule savedVisit = repository.save(visit);
+            Date now = new Date();
+            Date scheduleTime = savedVisit.getDatetime();
+            Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
+
+            if (now.after(fiveMinutesBefore) && now.before(scheduleTime)) {
+                Integer priestId = savedVisit.getPriest().getId();
+                String headline = savedVisit.getHeadline();
+                String message = "Bạn có lịch vào lúc " + scheduleTime.toString();
+
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        Thread.sleep(200); // delay cho frontend subscribe
+                        sendScheduleNotification(savedVisit.getId(), priestId, headline, message);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        Thread.currentThread().interrupt();
+                    }
+                });
+            }
+
+
             return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, visit);
         } catch (Exception e) {
             return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
@@ -72,6 +95,26 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
 
     @Override
     public ResponseObject updateScheduleVisit(VisitSchedule visit, Integer id) {
+        VisitSchedule savedVisit = repository.save(visit);
+        Date now = new Date();
+        Date scheduleTime = savedVisit.getDatetime();
+        Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
+
+        if (now.after(fiveMinutesBefore) && now.before(scheduleTime)) {
+            Integer priestId = savedVisit.getPriest().getId();
+            String headline = savedVisit.getHeadline();
+            String message = "Bạn có lịch vào lúc " + scheduleTime.toString();
+
+            CompletableFuture.runAsync(() -> {
+                try {
+                    Thread.sleep(1000); // delay cho frontend subscribe
+                    sendScheduleNotification(savedVisit.getId(), priestId, headline, message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
+                }
+            });
+        }
         if (repository.existsById(id)) {
             VisitSchedule updated = repository.findById(id).map(
                     schedule -> {
@@ -204,42 +247,49 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
     SimpMessagingTemplate messagingTemplate;
 
     public void sendScheduleNotification(Integer scheduleId,Integer priestId, String headline, String message) {
-        VisitSchedule visitSchedule = repository.findById(scheduleId).get();
-        NotificationDTO notification = new NotificationDTO(visitSchedule.getHeadline(), "Còn 5 phút nữa đến giờ công việc!", scheduleId);
+        NotificationDTO notification = new NotificationDTO( headline,"Còn 5 phút nữa đến giờ công việc!", scheduleId);
+        System.out.println("Sending to: /topic/schedule/" + priestId);
+        System.out.println("Message: " + message);
         messagingTemplate.convertAndSend("/topic/schedule/" + priestId, notification);
     }
 
-    // Lưu ID đã gửi để tránh gửi trùng
-    private Set<Integer> notified = new HashSet<>();
-
+    @Autowired
+    private NotificationController notificationController;
 
     // Chạy mỗi phút
     @Scheduled(fixedRate = 60_000)
     public void checkAndNotifyUpcomingSchedules() {
         Date now = new Date();
-        Date maxTime = new Date(now.getTime() + 5 * 60 * 1000); // now + 5 phút
         System.out.println("Bắt đầu kiểm tra lịch ");
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String strCurrDate = formatter.format(now);
 
         List<VisitSchedule> schedulesToday = repository.findVisitByCurrentDate(strCurrDate);
-
         for (VisitSchedule schedule : schedulesToday) {
             Date scheduleTime = schedule.getDatetime();
+            Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
 
-//            if (scheduleTime.after(now) && scheduleTime.before(maxTime)) {
-                if (!notified.contains(schedule.getId())) {
+            if (now.after(fiveMinutesBefore) && now.before(scheduleTime)) {
+                if (!notificationController.isNotified(schedule.getId())) {
                     Integer priestId = schedule.getPriest().getId();
-
                     String headline = schedule.getHeadline();
                     String message = "Bạn có lịch vào lúc " + scheduleTime.toString();
 
-                    this.sendScheduleNotification(schedule.getId(), priestId, headline, message);
-
-                    notified.add(schedule.getId());
-//                }
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            Thread.sleep(1000); // delay 200ms cho frontend subscribe
+                            sendScheduleNotification(schedule.getId(), priestId, headline, message);
+                            // Thêm ID vào notified sau khi gửi thành công
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Thread.currentThread().interrupt(); // phục hồi trạng thái interrupt
+                        }
+                    });
+                }
             }
+
         }
+
     }
 
 
