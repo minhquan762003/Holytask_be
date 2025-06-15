@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "parishioner_profiles")
@@ -18,22 +19,35 @@ public class ParishionerProfile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @OneToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     private String fullName;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
     private String address;
+
+    @ManyToOne
+    @JoinColumn(name = "parish_group_id")
+    private ParishGroup parishGroup;
+
+    @Column(unique = true, name = "phone_number")
+    private String phoneNumber;
 
     @ManyToOne
     @JoinColumn(name = "sub_parish_id")
     private SubParish subParish;
 
+    @Column(name = "updated_user")
+    private String updatedUser;
+
+    @Column(name = "img_url")
+    private String imgUrl;
+
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private Date createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private Date updatedAt;
 }
 

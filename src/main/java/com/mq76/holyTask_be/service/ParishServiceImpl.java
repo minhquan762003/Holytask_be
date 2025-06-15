@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ParishServiceImpl implements ParishService {
@@ -31,6 +33,26 @@ public class ParishServiceImpl implements ParishService {
         }catch (Exception e){
 
             return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI,null);
+        }
+    }
+
+    @Override
+    public ResponseObject finbyParishId(Integer parishId) {
+        try{
+            Optional<Parish> parish = repository.finbyParishId(parishId);
+            return new ResponseObject(MessageConstants.OK,MessageConstants.THANH_CONG,parish);
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI,null);
+        }
+    }
+
+    @Override
+    public ResponseObject getAllParish() {
+        try{
+            List<Parish> parishList = repository.findAll();
+            return new ResponseObject(MessageConstants.OK,MessageConstants.THANH_CONG,parishList);
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.OK,MessageConstants.THAT_BAI,null);
         }
     }
 }

@@ -264,7 +264,7 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         String strCurrDate = formatter.format(now);
 
-        List<VisitSchedule> schedulesToday = repository.findVisitByCurrentDate(strCurrDate);
+        List<VisitSchedule> schedulesToday = repository.findVisitByDate(strCurrDate);
         for (VisitSchedule schedule : schedulesToday) {
             Date scheduleTime = schedule.getDatetime();
             Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
@@ -293,7 +293,15 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
     }
 
 
-
+    @Override
+    public ResponseObject getVisitByDate(String strDate) {
+        try{
+            this.repository.findVisitByDate(strDate);
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, this.repository.findVisitByDate(strDate));
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        }
+    }
 
 
 }

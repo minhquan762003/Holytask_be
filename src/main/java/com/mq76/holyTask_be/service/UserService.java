@@ -15,5 +15,6 @@ public interface UserService {
     ResponseObject getUserById(Integer id);
     ResponseObject getUsersByRole(Role role);
     ResponseObject deactivateUser(Integer id);
+    ResponseObject findUserById(Integer id);
 }
 

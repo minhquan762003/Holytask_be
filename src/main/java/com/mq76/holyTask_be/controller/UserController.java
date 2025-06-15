@@ -9,6 +9,7 @@ import com.mq76.holyTask_be.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -34,7 +35,18 @@ public class UserController {
         if(responseObject.getStatus().equals(MessageConstants.OK)) {
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
         }else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseObject);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @GetMapping("/userId/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> getUserById(@PathVariable("userId") Integer userId) {
+        ResponseObject responseObject = userService.getUserById(userId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
         }
     }
 

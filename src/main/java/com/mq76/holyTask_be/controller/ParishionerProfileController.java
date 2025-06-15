@@ -18,7 +18,7 @@ public class ParishionerProfileController {
 
     @PostMapping("/add")
     public ResponseEntity<ResponseObject> createOrUpdateProfile(@RequestBody ParishionerProfile parishionerProfile){
-        ResponseObject responseObject = parishionerProfileService.createOrUpdateProfile(parishionerProfile);
+        ResponseObject responseObject = parishionerProfileService.createParishioner(parishionerProfile);
 
         if(responseObject.getStatus().equals(MessageConstants.OK)){
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
@@ -27,15 +27,25 @@ public class ParishionerProfileController {
         }
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<ResponseObject> getByUserId(@PathVariable Integer userId){
-        ResponseObject responseObject = parishionerProfileService.getByUserId(userId);
+    @PutMapping("/update")
+    public ResponseEntity<ResponseObject> updateProfile(@RequestBody ParishionerProfile parishionerProfile){
+        ResponseObject responseObject = parishionerProfileService.updateParishioner(parishionerProfile);
         if(responseObject.getStatus().equals(MessageConstants.OK)){
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
         }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
         }
     }
+
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<ResponseObject> getByUserId(@PathVariable Integer userId){
+//        ResponseObject responseObject = parishionerProfileService.getByUserId(userId);
+//        if(responseObject.getStatus().equals(MessageConstants.OK)){
+//            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+//        }else {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+//        }
+//    }
     @GetMapping("/{subParishId}")
     public ResponseEntity<ResponseObject> getBySubParishId(@PathVariable Integer subParishId){
         ResponseObject responseObject = parishionerProfileService.getBySubParishId(subParishId);

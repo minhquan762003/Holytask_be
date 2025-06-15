@@ -27,9 +27,29 @@ public class SubParishController {
         }
     }
 
-    @GetMapping("/{subParishId}")
-    public ResponseEntity<ResponseObject> findByParish_Id(@PathVariable Integer subParishId) {
-        ResponseObject responseObject=subParishService.findByParish_Id(subParishId);
+    @GetMapping("/{parishId}")
+    public ResponseEntity<ResponseObject> findByParish_Id(@PathVariable Integer parishId) {
+        ResponseObject responseObject=subParishService.findByParish_Id(parishId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @GetMapping("/allSubParish")
+    public ResponseEntity<ResponseObject> findAllSubParishes() {
+        ResponseObject responseObject=subParishService.findAllSubParishes();
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @GetMapping("/allGroups")
+    public ResponseEntity<ResponseObject> findAllGroups() {
+        ResponseObject responseObject = subParishService.findAllGroups();
         if(responseObject.getStatus().equals(MessageConstants.OK)){
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
         }else {

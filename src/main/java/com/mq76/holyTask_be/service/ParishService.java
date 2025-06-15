@@ -8,4 +8,6 @@ import java.util.List;
 public interface ParishService {
     ResponseObject createOrUpdateParish(Parish parish);
     ResponseObject findByNameContainingIgnoreCase(String name);
+    ResponseObject finbyParishId(Integer parishId);
+    ResponseObject getAllParish();
 }

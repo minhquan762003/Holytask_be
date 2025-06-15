@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParishionerProfileService {
-    ResponseObject createOrUpdateProfile(ParishionerProfile profile);
-    ResponseObject getByUserId(Integer userId);
+    ResponseObject createParishioner(ParishionerProfile profile);
+    ResponseObject updateParishioner(ParishionerProfile profile);
+//    ResponseObject getByUserId(Integer userId);
     ResponseObject getBySubParishId(Integer subParishId);
 }
 

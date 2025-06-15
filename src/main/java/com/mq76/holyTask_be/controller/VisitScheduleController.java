@@ -99,4 +99,15 @@ public class VisitScheduleController {
         }
     }
 
+    @GetMapping("/byDate")
+    @PreAuthorize("hasAnyAuthority('ADMIN','PRIEST')")
+    public ResponseEntity<ResponseObject> findVisitByDate(@RequestParam String strDate){
+        ResponseObject responseObject = visitScheduleService.getVisitByDate(strDate);
+        if (responseObject.getStatus().equals(MessageConstants.OK)) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
 }

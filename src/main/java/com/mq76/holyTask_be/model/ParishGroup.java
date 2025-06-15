@@ -7,30 +7,32 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "parishes")
+@Table(name = "parish_groups")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Parish {
+public class ParishGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
+    @Column(name = "name")
     private String name;
-    private String location;
 
-    @Column(name = "updated_user")
-    private String updatedUser;
+    @Column(name = "description")
+    private String description;
 
+    @CreationTimestamp
     @Column(name = "created_at")
-    @Temporal(TemporalType.DATE)
     private Date createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
-    @Temporal(TemporalType.DATE)
     private Date updatedAt;
+
+
 }

@@ -1,17 +1,16 @@
 package com.mq76.holyTask_be.service;
 
 import com.mq76.holyTask_be.auth.JwtUtils;
-import com.mq76.holyTask_be.model.MessageConstants;
-import com.mq76.holyTask_be.model.ResponseObject;
-import com.mq76.holyTask_be.model.Role;
-import com.mq76.holyTask_be.model.User;
+import com.mq76.holyTask_be.model.*;
 import com.mq76.holyTask_be.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -21,6 +20,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    @Autowired
+    private PriestProfileService priestProfileService;
     @Override
     public ResponseObject registerUser(User user) {
         Optional<User> userOptional = userRepository.findByUsername(user.getUsername());
@@ -33,7 +34,14 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         user.setRole(Role.PRIEST);
         user.setProfilePictureUrl("");
-        return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, userRepository.save(user));
+        user.setPhoneNumber(user.getPhoneNumber());
+        user.setProfilePictureUrl("https://i.ibb.co/FL5DXK4f/avatar-trang-4.jpg");
+        PriestProfile priestProfile = new PriestProfile();
+        User user1 = userRepository.save(user);
+        priestProfile.setUser(user1);
+        priestProfile.setCreatedAt(new Date());
+        priestProfileService.createProfile(priestProfile);
+        return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, user1);
     }
 
     @Override
@@ -41,7 +49,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findByUsername(username);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if(passwordEncoder.matches(password, user.getPasswordHash())) {
+            if(passwordEncoder.matches(password, user.getPasswordHash()) && user.getIsActive()) {
                 return new ResponseObject(MessageConstants.OK ,MessageConstants.THANH_CONG ,jwtUtils.generateToken(user));
             }
 
@@ -83,6 +91,16 @@ public class UserServiceImpl implements UserService {
                 user.setIsActive(false);
                 userRepository.save(user);
             });
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, userRepository.findById(id).get());
+        }catch (Exception e) {
+            return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
+        }
+    }
+
+    @Override
+    public ResponseObject findUserById(Integer id) {
+        try{
+            userRepository.findUserById(id);
             return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, userRepository.findById(id).get());
         }catch (Exception e) {
             return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);

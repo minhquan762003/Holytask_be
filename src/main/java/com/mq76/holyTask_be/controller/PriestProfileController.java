@@ -1,5 +1,6 @@
 package com.mq76.holyTask_be.controller;
 
+import com.mq76.holyTask_be.model.EditProfile;
 import com.mq76.holyTask_be.model.MessageConstants;
 import com.mq76.holyTask_be.model.PriestProfile;
 import com.mq76.holyTask_be.model.ResponseObject;
@@ -48,4 +49,15 @@ public class PriestProfileController {
         }
     }
 
+    @PostMapping("/update/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> updateProfile(@RequestBody EditProfile editProfile, @PathVariable Integer userId) {
+        ResponseObject responseObject = priestProfileService.updateProfile(editProfile, userId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+
+    }
 }

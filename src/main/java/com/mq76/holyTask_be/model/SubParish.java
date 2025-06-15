@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Date;
+
 @Entity
 @Table(name = "sub_parishes")
 @Data
@@ -23,7 +25,7 @@ public class SubParish {
     private Parish parish;
 
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private Date createdAt;
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private Date updatedAt;
 }

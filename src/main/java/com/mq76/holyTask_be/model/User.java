@@ -32,9 +32,16 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
-    private Boolean isActive = true;
+    private Boolean isActive;
+
+    @Column(name = "phone_number", nullable = true)
+    private String phoneNumber;
+
+    @Column(name = "updated_user")
+    private String updatedUser;
 
     @Column(name = "created_at")
     @Temporal(TemporalType.DATE)

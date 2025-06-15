@@ -37,4 +37,26 @@ public class ParishController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
         }
     }
+
+    @GetMapping("/parishId/{parishId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> findByParishId(@PathVariable Integer parishId) {
+        ResponseObject responseObject = parishService.finbyParishId(parishId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @GetMapping("/getAllParish")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> getAllParish() {
+        ResponseObject responseObject = parishService.getAllParish();
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
 }

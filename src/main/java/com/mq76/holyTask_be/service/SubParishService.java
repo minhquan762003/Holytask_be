@@ -8,4 +8,6 @@ import java.util.List;
 public interface SubParishService {
     ResponseObject createOrUpdateSubParish(SubParish subParish);
     ResponseObject findByParish_Id(Integer subParishId);
+    ResponseObject findAllSubParishes();
+    ResponseObject findAllGroups();
 }

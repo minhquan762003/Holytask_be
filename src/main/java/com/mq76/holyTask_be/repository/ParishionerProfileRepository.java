@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParishionerProfileRepository extends JpaRepository<ParishionerProfile, Integer> {
-    Optional<ParishionerProfile> findByUser_Id(Integer userId);
+//    Optional<ParishionerProfile> findByUser_Id(Integer userId);
     List<ParishionerProfile> findBySubParish_Id(Integer subParishId);
+    Optional<ParishionerProfile> findByPhoneNumber(String phoneNumber);
 }
