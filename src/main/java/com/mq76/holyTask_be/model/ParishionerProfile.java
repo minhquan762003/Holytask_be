@@ -1,4 +1,5 @@
 package com.mq76.holyTask_be.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "parishioner_profiles")
 @Data
@@ -19,10 +21,6 @@ public class ParishionerProfile {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-
     private String fullName;
     private Date dateOfBirth;
     private String address;
@@ -31,7 +29,7 @@ public class ParishionerProfile {
     @JoinColumn(name = "parish_group_id")
     private ParishGroup parishGroup;
 
-    @Column(unique = true, name = "phone_number")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @ManyToOne
@@ -40,6 +38,9 @@ public class ParishionerProfile {
 
     @Column(name = "updated_user")
     private String updatedUser;
+
+    @Column(name = "created_user")
+    private String createdUser;
 
     @Column(name = "img_url")
     private String imgUrl;

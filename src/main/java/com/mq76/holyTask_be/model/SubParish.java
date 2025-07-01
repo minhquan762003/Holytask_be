@@ -1,4 +1,5 @@
 package com.mq76.holyTask_be.model;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class SubParish {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
