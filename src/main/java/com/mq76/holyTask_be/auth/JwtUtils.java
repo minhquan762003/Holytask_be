@@ -49,6 +49,9 @@ public class JwtUtils {
                 .get("role", String.class);
     }
 
+    public Boolean extractIsActive(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().get("isActive", Boolean.class);
+    }
 
 
     public String extractUsername(String token) {
@@ -61,14 +64,14 @@ public class JwtUtils {
     }
 
 
-    public Long extractUserId(String token) {
+    public Integer extractUserId(String token) {
         String subject = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
-        return Long.parseLong(subject);
+        return Integer.parseInt(subject);
     }
 
     // Xác thực token

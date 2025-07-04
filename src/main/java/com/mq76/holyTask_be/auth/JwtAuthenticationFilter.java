@@ -1,5 +1,6 @@
 package com.mq76.holyTask_be.auth;
 import com.mq76.holyTask_be.model.Role;
+import com.mq76.holyTask_be.model.UserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,12 +35,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtUtils.extractUsername(token);
                 String role = jwtUtils.extractRole(token); // Trích xuất vai trò
 
-                Long userId = jwtUtils.extractUserId(token); // Trích xuất userId từ token
+                Integer userId = jwtUtils.extractUserId(token); // Trích xuất userId từ token
+                Boolean isActive = jwtUtils.extractIsActive(token);
                 // var authorities = Collections.singletonList(new
                 // SimpleGrantedAuthority(role));
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(role));
+                // Tạo UserPrincipal
+                UserPrincipal principal = new UserPrincipal(userId, username, null, authorities, isActive);
 
-                var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+
+                var authentication = new UsernamePasswordAuthenticationToken(principal, null, authorities);
                 authentication.setDetails(userId); // Gán userId vào authentication details
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

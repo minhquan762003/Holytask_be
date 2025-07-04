@@ -6,8 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 
 @Entity
@@ -50,5 +52,19 @@ public class User {
     @Column(name = "updated_at")
     @Temporal(TemporalType.DATE)
     private Date updatedAt;
+
+
+    public static UserPrincipal build(User user) {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().name());
+
+        return new UserPrincipal(
+                user.getId(),
+                user.getUsername(),
+                user.getPasswordHash(), // chú ý: đúng field password
+                Collections.singletonList(authority),
+                Boolean.TRUE.equals(user.getIsActive())
+        );
+    }
+
 }
 
