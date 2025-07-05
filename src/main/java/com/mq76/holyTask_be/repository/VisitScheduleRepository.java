@@ -23,4 +23,7 @@ public interface VisitScheduleRepository extends JpaRepository<VisitSchedule, In
     @Query(value = "select * from visit_schedules where DATE(visit_schedules.datetime) = STR_TO_DATE(:targetDate, '%d/%m/%Y')", nativeQuery = true)
     List<VisitSchedule> findVisitByDate(@Param("targetDate") String targetDate);
 
+    @Query(value = "select * from visit_schedules where DATE(visit_schedules.datetime) = STR_TO_DATE(:targetDate, '%d/%m/%Y') and visit_schedules.priest_id = :priestId and visit_schedules.status !=0 ", nativeQuery = true)
+    List<VisitSchedule> findVisitByPriestIdAndDate(@Param("targetDate") String targetDate,@Param("priestId") Integer priestId);
+
 }

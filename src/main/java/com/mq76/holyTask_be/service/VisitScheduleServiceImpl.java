@@ -1,10 +1,7 @@
 package com.mq76.holyTask_be.service;
 
 import com.mq76.holyTask_be.controller.NotificationController;
-import com.mq76.holyTask_be.model.MessageConstants;
-import com.mq76.holyTask_be.model.NotificationDTO;
-import com.mq76.holyTask_be.model.ResponseObject;
-import com.mq76.holyTask_be.model.VisitSchedule;
+import com.mq76.holyTask_be.model.*;
 import com.mq76.holyTask_be.repository.PriestProfileRepository;
 import com.mq76.holyTask_be.repository.VisitScheduleRepository;
 import com.sendgrid.Method;
@@ -64,6 +61,19 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
                 });
             }
 
+            SimpleDateFormat minuteFormat = new SimpleDateFormat("yyyyMMddHHmm");
+            String nowStr = minuteFormat.format(now);
+            String scheduleStr = minuteFormat.format(scheduleTime);
+
+            if (nowStr.equals(scheduleStr)
+                    && savedVisit.getStatus() != 0
+                    && savedVisit.getStatus() != 2) {
+
+                savedVisit.setStatus(0);
+                repository.save(savedVisit);
+            }
+
+
 
             return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, visit);
         } catch (Exception e) {
@@ -95,47 +105,61 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
 
     @Override
     public ResponseObject updateScheduleVisit(VisitSchedule visit, Integer id) {
-        VisitSchedule savedVisit = repository.save(visit);
+        Optional<VisitSchedule> optionalSchedule = repository.findById(id);
+
+        if (!optionalSchedule.isPresent()) {
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        }
+
+        VisitSchedule schedule = optionalSchedule.get();
+
+        // Cập nhật thông tin
+        schedule.setAddress(visit.getAddress());
+        schedule.setUpdatedAt(new Date());
+        schedule.setCreatedUser(visit.getCreatedUser());
+        schedule.setVisitType(visit.getVisitType());
+        schedule.setHeadline(visit.getHeadline());
+        schedule.setNotes(visit.getNotes());
+        schedule.setDatetime(visit.getDatetime());
+
+        VisitSchedule updated = repository.save(schedule);
+
+        // Gửi thông báo nếu còn 5 phút nữa tới giờ hẹn
         Date now = new Date();
-        Date scheduleTime = savedVisit.getDatetime();
+        Date scheduleTime = updated.getDatetime();
         Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
 
-        if (now.after(fiveMinutesBefore) && now.before(scheduleTime)) {
-            Integer priestId = savedVisit.getPriest().getId();
-            String headline = savedVisit.getHeadline();
+        if (now.after(fiveMinutesBefore) && now.before(scheduleTime) && updated.getStatus() == 1) {
+            Integer priestId = updated.getPriest().getId();
+            String headline = updated.getHeadline();
             String message = "Bạn có lịch vào lúc " + scheduleTime.toString();
 
             CompletableFuture.runAsync(() -> {
                 try {
                     Thread.sleep(1000); // delay cho frontend subscribe
-                    sendScheduleNotification(savedVisit.getId(), priestId, headline, message);
+                    sendScheduleNotification(updated.getId(), priestId, headline, message);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Thread.currentThread().interrupt();
                 }
             });
         }
-        if (repository.existsById(id)) {
-            VisitSchedule updated = repository.findById(id).map(
-                    schedule -> {
-                        schedule.setAddress(visit.getAddress());
-                        schedule.setUpdatedAt(new Date());
-                        schedule.setCreatedUser(visit.getCreatedUser());
-                        schedule.setVisitType(visit.getVisitType());
-                        schedule.setHeadline(visit.getHeadline());
-                        schedule.setNotes(visit.getNotes());
-                        schedule.setDatetime(visit.getDatetime());
-                        schedule.setUpdatedAt(new Date());
-                        return repository.save(schedule);
-                    }).orElseGet(() -> {
 
-                return null;
-            });
-            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, updated);
-        } else {
-            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        SimpleDateFormat minuteFormat = new SimpleDateFormat("yyyyMMddHHmm");
+
+        String nowStr = minuteFormat.format(now);
+        String scheduleStr = minuteFormat.format(scheduleTime);
+
+        if (nowStr.equals(scheduleStr) && updated.getStatus() != 0 && updated.getStatus() != 2) {
+            updated.setStatus(0);
+            repository.save(updated);
         }
+
+
+
+        return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, updated);
     }
+
 
     @Override
     public ResponseObject findById(Integer id) {
@@ -269,7 +293,7 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
             Date scheduleTime = schedule.getDatetime();
             Date fiveMinutesBefore = new Date(scheduleTime.getTime() - 5 * 60 * 1000);
 
-            if (now.after(fiveMinutesBefore) && now.before(scheduleTime)) {
+            if (now.after(fiveMinutesBefore) && now.before(scheduleTime) && schedule.getStatus() == 1) {
                 if (!notificationController.isNotified(schedule.getId())) {
                     Integer priestId = schedule.getPriest().getId();
                     String headline = schedule.getHeadline();
@@ -287,21 +311,60 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
                     });
                 }
             }
+            SimpleDateFormat minuteFormat = new SimpleDateFormat("yyyyMMddHHmm");
+            String nowStr = minuteFormat.format(now);
+            String scheduleStr = minuteFormat.format(scheduleTime);
+
+            if (nowStr.equals(scheduleStr) && schedule.getStatus() != 0 && schedule.getStatus() != 2) {
+                System.out.println("✔ Trùng phút – Cập nhật trạng thái của scheduleId = " + schedule.getId());
+                schedule.setStatus(0);
+                repository.save(schedule);
+            }
+
 
         }
 
     }
 
-
     @Override
-    public ResponseObject getVisitByDate(String strDate) {
+    public ResponseObject getVisitByScheduleId(Integer priestId) {
         try{
-            this.repository.findVisitByDate(strDate);
-            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, this.repository.findVisitByDate(strDate));
+            VisitSchedule foundVisit = this.repository.findById(priestId).get();
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, foundVisit);
         }catch (Exception e){
             return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
         }
     }
+
+    @Override
+    public ResponseObject setStatusByScheduleId(Integer scheduleId) {
+        try {
+            Optional<VisitSchedule> visitOpt = repository.findById(scheduleId);
+            if (visitOpt.isEmpty()) {
+                return new ResponseObject(MessageConstants.FAILED, "Không tìm thấy lịch viếng", null);
+            }
+
+            VisitSchedule foundVisit = visitOpt.get();
+            foundVisit.setStatus(2);
+            repository.save(foundVisit);
+
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, foundVisit);
+        } catch (Exception e) {
+            // logger.error("Lỗi khi cập nhật lịch viếng: {}", e.getMessage());
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        }
+    }
+
+
+    @Override
+    public ResponseObject findVisitByPriestIdAndDate(String strDate, Integer priestId) {
+        try{
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, this.repository.findVisitByPriestIdAndDate(strDate,priestId));
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        }
+    }
+
 
 
 }

@@ -16,6 +16,8 @@ public interface VisitScheduleService {
     ResponseObject findById(Integer id);
     ResponseObject sendEmailNotification(Integer idVisit, String userEmail);
     ResponseObject deleteScheduleVisit(Integer id);
-    ResponseObject getVisitByDate(String strDate);
+    ResponseObject findVisitByPriestIdAndDate(String strDate, Integer priestId);
+    ResponseObject getVisitByScheduleId(Integer priestId);
+    ResponseObject setStatusByScheduleId(Integer scheduleId);
 }
 

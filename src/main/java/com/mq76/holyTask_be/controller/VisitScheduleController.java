@@ -99,10 +99,32 @@ public class VisitScheduleController {
         }
     }
 
-    @GetMapping("/byDate")
+    @GetMapping("/byDate/priestId/{priestId}")
     @PreAuthorize("hasAnyAuthority('ADMIN','PRIEST')")
-    public ResponseEntity<ResponseObject> findVisitByDate(@RequestParam String strDate){
-        ResponseObject responseObject = visitScheduleService.getVisitByDate(strDate);
+    public ResponseEntity<ResponseObject> findVisitByDate(@RequestParam String strDate, @PathVariable Integer priestId){
+        ResponseObject responseObject = visitScheduleService.findVisitByPriestIdAndDate(strDate,priestId);
+        if (responseObject.getStatus().equals(MessageConstants.OK)) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @GetMapping("/scheduleId/{scheduleId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','PRIEST')")
+    public ResponseEntity<ResponseObject> getScheduleById(@PathVariable Integer scheduleId){
+        ResponseObject responseObject = visitScheduleService.getVisitByScheduleId(scheduleId);
+        if (responseObject.getStatus().equals(MessageConstants.OK)) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @PutMapping("/setStatus/{scheduleId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','PRIEST')")
+    public ResponseEntity<ResponseObject> setStatusByScheduleId(@PathVariable Integer scheduleId){
+        ResponseObject responseObject = visitScheduleService.setStatusByScheduleId(scheduleId);
         if (responseObject.getStatus().equals(MessageConstants.OK)) {
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
         }else {

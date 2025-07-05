@@ -106,5 +106,31 @@ public class UserServiceImpl implements UserService {
             return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
         }
     }
+
+    @Override
+    public ResponseObject getAllUsers() {
+        try {
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, userRepository.findAllUsers());
+        }catch (Exception e) {
+            return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
+        }
+    }
+
+    @Override
+    public ResponseObject updateUser(User user, UserPrincipal userPrincipal) {
+        try {
+            User foundUser = userRepository.findUserById(user.getId()).get();
+            if(foundUser!=null) {
+                foundUser.setIsActive(user.getIsActive());
+                foundUser.setRole(user.getRole());
+                foundUser.setUpdatedUser(userPrincipal.getUsername());
+                foundUser.setUpdatedAt(new Date());
+                userRepository.save(foundUser);
+            }
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, foundUser);
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
+        }
+    }
 }
 

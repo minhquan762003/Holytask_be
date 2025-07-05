@@ -46,12 +46,13 @@ public class User {
     private String updatedUser;
 
     @Column(name = "created_at")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @Column(name = "updated_at")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
 
 
     public static UserPrincipal build(User user) {
