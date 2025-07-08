@@ -156,4 +156,26 @@ public class ParishionerProfileServiceImpl implements ParishionerProfileService 
         }
     }
 
+    @Override
+    public ResponseObject getAllParishionersOrderByViewDate(Integer parishId) {
+        try{
+            List<ParishionerProfile> lst = repository.findByParishIdOrderByViewDateDesc(parishId);
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, lst);
+        }catch (Exception e){
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI,null);
+        }
+    }
+
+    @Override
+    public ResponseObject setParishionerViewDate(Integer parishionerId) {
+        try{
+            ParishionerProfile found = repository.findById(parishionerId).get();
+            found.setViewDate(new Date());
+            repository.save(found);
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, found);
+        }catch (Exception e) {
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI,null);
+        }
+    }
+
 }

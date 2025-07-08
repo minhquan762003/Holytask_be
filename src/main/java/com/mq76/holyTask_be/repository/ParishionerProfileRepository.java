@@ -57,5 +57,8 @@ public interface ParishionerProfileRepository extends JpaRepository<ParishionerP
             @Param("name") String name);
 
 
+    @Query(value = "select * from parishioner_profiles where sub_parish_id in (select id from sub_parishes where parish_id = :parishId) order by view_date desc ",nativeQuery = true)
+    List<ParishionerProfile> findByParishIdOrderByViewDateDesc(@Param("parishId") Integer parishId);
+
 
 }

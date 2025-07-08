@@ -132,5 +132,31 @@ public class UserServiceImpl implements UserService {
             return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
         }
     }
+
+    @Override
+    public ResponseObject resetPassword(Integer id, ResetPassRequest resetPassRequest) {
+        try {
+                Optional<User> userOpt = userRepository.findById(id);
+            if (!userOpt.isPresent()) {
+                return new ResponseObject(MessageConstants.FAILED, "Không tìm thấy người dùng", null);
+            }
+
+            User foundUser = userOpt.get();
+
+            // So sánh mật khẩu cũ với hash
+            if (!passwordEncoder.matches(resetPassRequest.getOldPassword(), foundUser.getPasswordHash())) {
+                return new ResponseObject(MessageConstants.FAILED, MessageConstants.OLD_PASSWORD_FAILED, null);
+            }
+
+            // Mã hóa mật khẩu mới và lưu lại
+            foundUser.setPasswordHash(passwordEncoder.encode(resetPassRequest.getNewPassword()));
+            userRepository.save(foundUser);
+
+            return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, foundUser);
+        } catch (Exception e) {
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
+        }
+    }
+
 }
 

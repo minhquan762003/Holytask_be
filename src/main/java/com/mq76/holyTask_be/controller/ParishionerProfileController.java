@@ -98,4 +98,25 @@ public class ParishionerProfileController {
         }
     }
 
+    @GetMapping("/orderByViewDate/{parishId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> getByParishIdOrderByViewDate(@PathVariable Integer parishId){
+        ResponseObject responseObject = parishionerProfileService.getAllParishionersOrderByViewDate(parishId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @PutMapping("/setViewDate/{parishionerId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> setParishionerViewDate(@PathVariable Integer parishionerId){
+        ResponseObject responseObject = parishionerProfileService.setParishionerViewDate(parishionerId);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
 }

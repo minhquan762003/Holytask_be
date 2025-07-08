@@ -15,5 +15,7 @@ public interface ParishionerProfileService {
     ResponseObject getByParishId(Integer parishId);
     ResponseObject findParishioners(Integer parishId, Integer groupId, String name);
     ResponseObject deleteParishioner(Integer parishId);
+    ResponseObject getAllParishionersOrderByViewDate(Integer parishId);
+    ResponseObject setParishionerViewDate(Integer parishionerId);
 }
 

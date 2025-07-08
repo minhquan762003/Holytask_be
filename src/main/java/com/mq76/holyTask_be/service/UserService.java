@@ -1,9 +1,6 @@
 package com.mq76.holyTask_be.service;
 
-import com.mq76.holyTask_be.model.ResponseObject;
-import com.mq76.holyTask_be.model.Role;
-import com.mq76.holyTask_be.model.User;
-import com.mq76.holyTask_be.model.UserPrincipal;
+import com.mq76.holyTask_be.model.*;
 
 import javax.swing.text.html.Option;
 import java.util.List;
@@ -19,5 +16,6 @@ public interface UserService {
     ResponseObject findUserById(Integer id);
     ResponseObject getAllUsers();
     ResponseObject updateUser(User user, UserPrincipal userPrincipal);
+    ResponseObject resetPassword(Integer id, ResetPassRequest resetPassRequest);
 }
 

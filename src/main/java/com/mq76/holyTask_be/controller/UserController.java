@@ -70,4 +70,16 @@ public class UserController {
         }
     }
 
+    @PutMapping("/resetPassword/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> resetPassword(@PathVariable Integer userId,@RequestBody ResetPassRequest resetPassRequest){
+        ResponseObject responseObject = userService.resetPassword(userId, resetPassRequest);
+        if(responseObject.getStatus().equals(MessageConstants.OK)) {
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+
 }

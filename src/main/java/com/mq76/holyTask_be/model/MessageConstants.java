@@ -9,4 +9,5 @@ public class MessageConstants {
     public static final String NUMBER_EXISTED = "Số điện thoại của giáo dân này đã được sử dụng";
     public static final String PARISHIONER_NOT_FOUND = "Không tìm thấy giáo dân để cập nhật";
     public static final String TOKEN_FAILED = "SIGN_IN_FAILED";
+    public static final String OLD_PASSWORD_FAILED = "Mật khẩu cũ không chính xác";
 }

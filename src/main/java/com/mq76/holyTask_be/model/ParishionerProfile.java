@@ -45,6 +45,9 @@ public class ParishionerProfile {
     @Column(name = "img_url")
     private String imgUrl;
 
+    @Column(name = "view_date")
+    private Date viewDate;
+
     @CreationTimestamp
     private Date createdAt;
 
