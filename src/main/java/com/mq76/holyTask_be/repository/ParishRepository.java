@@ -11,5 +11,8 @@ public interface ParishRepository extends JpaRepository<Parish, Integer> {
     List<Parish> findByNameContainingIgnoreCase(String name);
     @Query(value = "select * from parishes where id = :parishId", nativeQuery = true)
     Optional<Parish> finbyParishId(@Param(value = "parishId") Integer parishId);
+
+    @Query( value = " select * from parishes where is_selected = 0 order by  name ", nativeQuery = true)
+    List<Parish> findbyIsSelected();
 }
 

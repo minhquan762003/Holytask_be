@@ -27,10 +27,18 @@ public class Parish {
     private String updatedUser;
 
     @Column(name = "created_at")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
     @Column(name = "updated_at")
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
+
+
+    @Column(name = "created_user")
+    private String createdUser;
+
+    @Column(name = "is_selected")
+    private Integer isSelected;
+
 }

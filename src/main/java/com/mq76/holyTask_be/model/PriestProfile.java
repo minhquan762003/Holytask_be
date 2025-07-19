@@ -43,4 +43,7 @@ public class PriestProfile {
     @Column(name = "updated_at")
     @Temporal(TemporalType.DATE)
     private Date updatedAt;
+
+    @Column(name = "created_user")
+    private String createdUser;
 }

@@ -35,6 +35,23 @@ public class VisitScheduleServiceImpl implements VisitScheduleService {
     @Override
     public ResponseObject createScheduleVisit(VisitSchedule visit) {
         try {
+            List<VisitSchedule> lstVisitSchedule = repository.findAllVisitSchedulesActive();
+            Date newStart = visit.getDatetime();
+            Date newEnd = new Date(newStart.getTime() + visit.getDurationMinutes() * 60 * 1000);
+
+            for (VisitSchedule existing : lstVisitSchedule) {
+                Date existStart = existing.getDatetime();
+                Date existEnd = new Date(existStart.getTime() + existing.getDurationMinutes() * 60 * 1000);
+
+                // Kiểm tra xem có giao nhau không
+                boolean isOverlap = newStart.before(existEnd) && newEnd.after(existStart);
+                if (isOverlap) {
+                    return new ResponseObject(MessageConstants.FAILED, MessageConstants.TIME_ERROR, existing);
+                }
+            }
+
+
+
             visit.setNotes(visit.getNotes().trim());
             visit.setStatus(1);
             visit.setDatetime(visit.getDatetime());

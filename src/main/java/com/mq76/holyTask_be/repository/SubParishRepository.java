@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface SubParishRepository extends JpaRepository<SubParish, Integer> {
     List<SubParish> findByParish_Id(Integer parishId);
-    @Query(value = "select * from sub_parishes", nativeQuery = true)
+    @Query(value = "select * from sub_parishes order by parish_id", nativeQuery = true)
     List<SubParish> findAllSubParishes();
 }
 

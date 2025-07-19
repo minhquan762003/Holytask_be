@@ -64,67 +64,64 @@ public class PriestProfileServiceImpl implements PriestProfileService {
 
     @Override
     public ResponseObject updateProfile(EditProfile editProfile, Integer userId) {
-        User foundUser = userRepository.findById(userId).get();
-        try{
-            if(userRepository.findById(userId).isPresent()) {
-                User user = userRepository.findById(userId).map(
-                        user1 -> {
-                            user1.setUpdatedAt(new Date());
-                            user1.setUpdatedUser(foundUser.getUsername().trim());
-                            user1.setProfilePictureUrl(editProfile.getAvatar().trim());
-                            user1.setEmail(editProfile.getEmail().trim());
-                            user1.setPhoneNumber(editProfile.getPhone().trim());
-                            return userRepository.save(user1);
-                        }).orElseGet(() ->{
-                    return null;
-                });
-
+        try {
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if (!optionalUser.isPresent()) {
+                return new ResponseObject(MessageConstants.FAILED, MessageConstants.NOT_FOUND_USER, null);
             }
 
-//            PriestProfile foundPriestProfile = priestRepo.findByUser_Id(userId).get();
+            User user = optionalUser.get();
+            user.setUpdatedAt(new Date());
+            user.setUpdatedUser(user.getUsername().trim());
+            user.setProfilePictureUrl(editProfile.getAvatar().trim());
+            user.setEmail(editProfile.getEmail().trim());
+            user.setPhoneNumber(editProfile.getPhone().trim());
+            userRepository.save(user);
+
             Optional<PriestProfile> optionalPriestProfile = priestProfileRepository.findByUser_Id(userId);
             PriestProfile priestProfile;
 
             if (optionalPriestProfile.isPresent()) {
-                // Cập nhật bản ghi hiện có
                 priestProfile = optionalPriestProfile.get();
                 priestProfile.setUpdatedAt(new Date());
-                priestProfile.setUpdatedUser(foundUser.getUsername());
+                priestProfile.setUpdatedUser(user.getUsername());
             } else {
-                // Tạo bản ghi mới
                 priestProfile = new PriestProfile();
                 priestProfile.setCreatedAt(new Date());
-                priestProfile.setUpdatedUser(foundUser.getUsername());
-                priestProfile.setUser(foundUser);
+                priestProfile.setCreatedUser(user.getUsername());
+                priestProfile.setUser(user);
             }
 
-// Dữ liệu dùng chung cho cả cập nhật hoặc tạo mới
+            // Lưu thông tin cơ bản
             priestProfile.setFullName(editProfile.getFullName());
             priestProfile.setBio(editProfile.getBio());
             priestProfile.setOrdinationDate(editProfile.getOrdinationDate());
-            priestProfile.setParish(parishRepository.findById(editProfile.getParishId()).orElse(null));
+
+            // Xử lý giáo xứ (nếu có thay đổi)
+            Parish oldParish = priestProfile.getParish();
+            Parish newParish = parishRepository.findById(editProfile.getParishId()).orElse(null);
+
+            if (oldParish != null && newParish != null && !oldParish.getId().equals(newParish.getId())) {
+                oldParish.setIsSelected(0);
+                parishRepository.save(oldParish);
+
+                newParish.setIsSelected(1);
+                parishRepository.save(newParish);
+            }
+
+            if (newParish != null) {
+                priestProfile.setParish(newParish);
+            }
 
             priestProfileRepository.save(priestProfile);
 
-//            PriestProfile priestProfile = priestRepo.findByUser_Id(userId).get();
-//            Parish parish = priestProfile.getParish();
-//            if(parish != null) {
-//                Parish parish1 = parishRepository.findById(parish.getId()).map(
-//                        parish2 -> {
-//                            parish2.setUpdatedAt(new Date());
-//                            parish2.setUpdatedUser(foundUser.getUsername());
-//                            parish2.setName(editProfile.getParish());
-//                            return parishRepository.save(parish2);
-//                        }).orElseGet(()->{
-//                            return null;
-//                });
-//            }
-
             return new ResponseObject(MessageConstants.OK, MessageConstants.THANH_CONG, editProfile);
-        }catch (Exception e){
-            return new ResponseObject(MessageConstants.FAILED,MessageConstants.THAT_BAI,null);
+
+        } catch (Exception e) {
+            return new ResponseObject(MessageConstants.FAILED, MessageConstants.THAT_BAI, null);
         }
     }
+
 
 
 

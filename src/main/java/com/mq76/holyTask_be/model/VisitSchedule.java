@@ -41,6 +41,10 @@ public class VisitSchedule {
 
     @Column(name = "status")
     private Integer status;
+
+    @Column(name = "duration_minutes")
+    private Integer durationMinutes;
+
     @CreationTimestamp
     private Date createdAt;
     @UpdateTimestamp

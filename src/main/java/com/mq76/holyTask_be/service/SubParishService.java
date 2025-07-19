@@ -10,4 +10,6 @@ public interface SubParishService {
     ResponseObject findByParish_Id(Integer subParishId);
     ResponseObject findAllSubParishes();
     ResponseObject findAllGroups();
+    ResponseObject updateSubParish(SubParish subParish);
+    ResponseObject deleteSubParish(Integer subParishId);
 }

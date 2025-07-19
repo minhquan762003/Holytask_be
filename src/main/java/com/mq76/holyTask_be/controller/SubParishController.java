@@ -19,7 +19,7 @@ public class SubParishController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
-    public ResponseEntity<ResponseObject> createOrUpdateSubParish(SubParish subParish) {
+    public ResponseEntity<ResponseObject> createOrUpdateSubParish(@RequestBody SubParish subParish) {
         ResponseObject responseObject=subParishService.createOrUpdateSubParish(subParish);
         if(responseObject.getStatus().equals(MessageConstants.OK)){
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
@@ -55,6 +55,28 @@ public class SubParishController {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
     public ResponseEntity<ResponseObject> findAllGroups() {
         ResponseObject responseObject = subParishService.findAllGroups();
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @PutMapping("/update")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> updateSubParish(@RequestBody  SubParish subParish) {
+        ResponseObject responseObject=subParishService.updateSubParish(subParish);
+        if(responseObject.getStatus().equals(MessageConstants.OK)){
+            return ResponseEntity.status(HttpStatus.OK).body(responseObject);
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseObject);
+        }
+    }
+
+    @DeleteMapping("/delete/{subParishId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRIEST')")
+    public ResponseEntity<ResponseObject> deleteSubParish(@PathVariable Integer subParishId) {
+        ResponseObject responseObject=subParishService.deleteSubParish(subParishId);
         if(responseObject.getStatus().equals(MessageConstants.OK)){
             return ResponseEntity.status(HttpStatus.OK).body(responseObject);
         }else {
