@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: holy_task
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  app:
+    build: .
+    environment:
+      - DB_URL=jdbc:mysql://mysql:3306/holy_task
+      - DB_USERNAME=root
+      - DB_PASSWORD=123456
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
