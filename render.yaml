@@ -15,9 +15,3 @@ services:
         sync: false
       - key: SENDGRID_API_KEY
         sync: false
-      - key: MINIO_URL
-        sync: false
-      - key: MINIO_ACCESS_KEY
-        sync: false
-      - key: MINIO_SECRET_KEY
-        sync: false
