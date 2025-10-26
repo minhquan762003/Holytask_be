@@ -1,6 +1,23 @@
 services:
   - type: web
-    name: holytask-be
-    env: docker
-    dockerfilePath: ./Dockerfile
+    name: holyTask-be
+    env: java
+    runtime: openjdk23
     plan: free
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/holyTask_be-0.0.1-SNAPSHOT.jar
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: MINIO_URL
+        sync: false
+      - key: MINIO_ACCESS_KEY
+        sync: false
+      - key: MINIO_SECRET_KEY
+        sync: false
